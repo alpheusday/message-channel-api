@@ -47,7 +47,9 @@ import "message-channel-api/polyfill";
 
 ## Compatibility
 
-### Runtime compatibility
+The following is a summary of the compatibility for this package.
+
+### Runtime Compatibility
 
 - Build target: ES2015
 - Package format: TypeScript declarations, ESModule, CommonJS
@@ -55,27 +57,33 @@ import "message-channel-api/polyfill";
 - Required ES2015 built-ins: `Promise`, `WeakMap`, `Map`, `Set`
 - Supported missing globals: `Event`, `EventTarget`, `MessageEvent`, `queueMicrotask`, `structuredClone`
 
-### Web API compatibility
+### MessageChannel API Compatibility
 
-The Web API compatibility matrix is as follows:
+The compatibility list below follows the API surface listed by MDN in [`MessageChannel`](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel).
 
-| Area                         | Status                | Notes                                                                                                                                                                             |
-| ---------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Core channel API             | Supported             | `MessageChannelPolyfill` provides entangled `port1` and `port2`.                                                                                                                  |
-| Core port API                | Supported             | `MessagePortPolyfill` supports `postMessage()`, `start()`, `close()`, `onclose`, `onmessage`, and `onmessageerror`.                                                             |
-| Message listeners            | Supported             | `addEventListener()` and `removeEventListener()` work for message listeners.                                                                                                      |
-| `close` event                | Supported             | The entangled port receives `close` through `addEventListener("close", ...)` or `onclose` when its peer is closed.                                                              |
-| Queueing before `start()`    | Supported             | Messages queue until the receiving port is started.                                                                                                                               |
-| `onmessage` auto-start       | Supported             | Assigning `onmessage` starts the receiving port and flushes queued messages.                                                                                                      |
-| Delivery timing              | Partial               | Messages are dispatched one queued message per task, which is closer to native behavior. It still uses host scheduling (`setImmediate()`/`setTimeout()` fallback), not a browser event loop implementation. |
-| Native structured clone      | Supported             | Uses native `structuredClone()` when the runtime provides it.                                                                                                                     |
-| Fallback cloning             | Supported with limits | In older runtimes, common values are cloned: primitives, plain objects, arrays, `Map`, `Set`, `Date`, `RegExp`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`, and typed arrays. |
-| Transfer lists               | Partial               | Transfer lists are forwarded to native `structuredClone()` when it supports them. `ArrayBuffer` transfer is covered by tests.                                                     |
-| Transferred `MessagePort`s   | Not supported         | Native-style `MessagePort` transfer and `MessageEvent.ports` population are not implemented by the polyfill.                                                                     |
-| `messageerror` dispatch      | Not supported         | The `onmessageerror` property exists, but `messageerror` events are not currently dispatched. Clone failures throw `DataCloneError` from `postMessage()`.                         |
-| Event model scope            | Partial               | The event behavior is implemented for `MessagePort` usage, not as a full DOM `EventTarget` replacement.                                                                           |
-| Transfer emulation           | Not supported         | Transfer lists are not emulated when native `structuredClone()` is unavailable.                                                                                                   |
-| Non-plain/custom clone cases | Not supported         | Functions, symbols, and most custom class instances are not cloneable without native `structuredClone()`.                                                                         |
+| API surface      | Support   | Notes                                                                 |
+| ---------------- | --------- | --------------------------------------------------------------------- |
+| `MessageChannel` | Supported | Exported as `MessageChannelPolyfill` and aliased as `MessageChannel`. |
+| `port1`          | Supported | Exposes one side of the entangled port pair.                          |
+| `port2`          | Supported | Exposes the other side of the entangled port pair.                    |
+
+### MessagePort API Compatibility
+
+The compatibility list below follows the API surface listed by MDN in [`MessagePort`](https://developer.mozilla.org/en-US/docs/Web/API/MessagePort).
+
+| API surface          | Support   | Notes                                                                                                                                                                                                                                |
+| -------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `MessagePort`        | Supported | Supports `postMessage()`, `start()`, `close()`, `onclose`, `onmessage`, `onmessageerror`, `addEventListener()`, and `removeEventListener()` for port events.                                                                         |
+| `start()`            | Supported | Queued messages flush after `start()`. Assigning `onmessage` also starts the receiving port.                                                                                                                                         |
+| `postMessage()`      | Partial   | Messages are cloned and delivered asynchronously. Transfer lists are forwarded only when native `structuredClone()` supports them, and native-style `MessagePort` transfer plus `MessageEvent.ports` population are not implemented. |
+| `close()`            | Supported | Closing one port detangles both ports and dispatches `close` on the peer port.                                                                                                                                                       |
+| `message` event      | Supported | Works with both `addEventListener("message", ...)` and `onmessage`.                                                                                                                                                                  |
+| `messageerror` event | Partial   | `onmessageerror` exists, but `messageerror` events are not currently dispatched. Clone failures throw `DataCloneError` from `postMessage()`.                                                                                         |
+
+Additional notes:
+
+- Without native `structuredClone()`, cloning is limited to common built-in data types such as primitives, plain objects, arrays, `Map`, `Set`, `Date`, `RegExp`, `ArrayBuffer`, `SharedArrayBuffer`, `DataView`, and typed arrays.
+- The event behavior is implemented for `MessagePort` usage, not as a full DOM `EventTarget` replacement.
 
 ## License
 
