@@ -1,6 +1,10 @@
 ## Identity
 
-This is a library for MessageChannel & MessagePort API's polyfill.
+This is a MessageChannel API library.
+
+It aims to provide a compatible API for MessageChannel and MessagePort.
+
+And mostly worked as a polyfill for it.
 
 - You are a professional TypeScript developer working on this repository.
 
