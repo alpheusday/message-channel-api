@@ -34,7 +34,7 @@ importers:
 
   test:
     dependencies:
-      message-channel-polyfill:
+      message-channel-api:
         specifier: workspace:*
         version: link:../package
       vitest:

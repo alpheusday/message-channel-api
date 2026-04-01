@@ -1,7 +1,7 @@
 {
     "private": true,
     "dependencies": {
-        "message-channel-polyfill": "workspace:*",
+        "message-channel-api": "workspace:*",
         "vitest": "^4.1.0"
     },
     "devDependencies": {

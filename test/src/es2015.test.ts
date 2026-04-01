@@ -1,4 +1,4 @@
-import type { MessageChannelPolyfillTarget } from "message-channel-polyfill";
+import type { MessageChannelPolyfillTarget } from "message-channel-api";
 
 import { describe, expect, test, vi } from "vitest";
 
@@ -58,8 +58,8 @@ describe("ES2015 compatibility", (): void => {
         Reflect.deleteProperty(root, "structuredClone");
 
         try {
-            const packageModule: typeof import("message-channel-polyfill") =
-                await import("message-channel-polyfill");
+            const packageModule: typeof import("message-channel-api") =
+                await import("message-channel-api");
 
             const channel: InstanceType<
                 typeof packageModule.MessageChannelPolyfill

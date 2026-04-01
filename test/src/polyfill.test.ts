@@ -1,10 +1,10 @@
-import type { MessageChannelPolyfillTarget } from "message-channel-polyfill";
+import type { MessageChannelPolyfillTarget } from "message-channel-api";
 
 import {
     installMessageChannelPolyfill,
     MessageChannelPolyfill,
     MessagePortPolyfill,
-} from "message-channel-polyfill";
+} from "message-channel-api";
 import { describe, expect, test } from "vitest";
 
 const waitForTurn = (): Promise<void> => {
@@ -177,7 +177,7 @@ describe("installMessageChannelPolyfill", (): void => {
         Reflect.deleteProperty(globalThis, "MessagePort");
 
         try {
-            await import("message-channel-polyfill/polyfill");
+            await import("message-channel-api/polyfill");
 
             expect(globalThis.MessageChannel).toBe(MessageChannelPolyfill);
             expect(globalThis.MessagePort).toBe(MessagePortPolyfill);
