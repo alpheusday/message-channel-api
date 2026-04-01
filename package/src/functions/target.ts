@@ -1,11 +1,11 @@
 import type { MessageChannelPolyfillTarget } from "#/@types/target";
 
-interface MessageChannelPolyfillTargetCandidates {
+type MessageChannelPolyfillTargetCandidates = {
     global?: MessageChannelPolyfillTarget;
     globalThis?: MessageChannelPolyfillTarget;
     self?: MessageChannelPolyfillTarget;
     window?: MessageChannelPolyfillTarget;
-}
+};
 
 type MessageChannelPolyfillTargetFallback = () => MessageChannelPolyfillTarget;
 

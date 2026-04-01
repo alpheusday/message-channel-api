@@ -2,10 +2,10 @@ import type { MessagePortPolyfill } from "#/classes/port";
 
 type MessagePortEventType = "message" | "messageerror";
 
-interface MessagePortEventDataMap {
+type MessagePortEventDataMap = {
     message: unknown;
     messageerror: unknown;
-}
+};
 
 type MessagePortEventHandler<TType extends MessagePortEventType> =
     | ((
@@ -33,7 +33,7 @@ type TypedArrayConstructor = new (
     length?: number,
 ) => TypedArray;
 
-interface MessagePortState {
+type MessagePortState = {
     closed: boolean;
     dispatchScheduled: boolean;
     entangledPort: MessagePortPolyfill | null;
@@ -44,11 +44,11 @@ interface MessagePortState {
     onmessage: MessagePortEventHandler<"message">;
     onmessageerror: MessagePortEventHandler<"messageerror">;
     started: boolean;
-}
+};
 
-interface FallbackCloneContext {
+type FallbackCloneContext = {
     seen: WeakMap<object, object>;
-}
+};
 
 export type {
     FallbackCloneContext,

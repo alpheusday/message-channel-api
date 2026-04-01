@@ -1,9 +1,9 @@
 import type { MessageChannelPolyfill } from "#/classes/channel";
 import type { MessagePortPolyfill } from "#/classes/port";
 
-interface MessageChannelPolyfillTarget {
+type MessageChannelPolyfillTarget = {
     MessageChannel?: typeof MessageChannelPolyfill;
     MessagePort?: typeof MessagePortPolyfill;
-}
+};
 
 export type { MessageChannelPolyfillTarget };

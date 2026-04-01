@@ -1,15 +1,15 @@
 import type { MessagePortEventType } from "#/@types/port";
 
-interface MessagePortEventListenerEntry {
+type MessagePortEventListenerEntry = {
     callback: EventListenerOrEventListenerObject;
     capture: boolean;
     once: boolean;
-}
+};
 
-interface MessagePortEventListenerOptions {
+type MessagePortEventListenerOptions = {
     capture: boolean;
     once: boolean;
-}
+};
 
 const getMessagePortEventListenerOptions = (
     options?: boolean | AddEventListenerOptions,

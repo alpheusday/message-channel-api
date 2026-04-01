@@ -2,13 +2,13 @@ import type { MessageChannelPolyfillTarget } from "message-channel-polyfill";
 
 import { describe, expect, test, vi } from "vitest";
 
-interface TestGlobalValues {
+type TestGlobalValues = {
     Event?: typeof Event;
     EventTarget?: typeof EventTarget;
     MessageEvent?: typeof MessageEvent;
     queueMicrotask?: typeof queueMicrotask;
     structuredClone?: typeof structuredClone;
-}
+};
 
 const waitForTurn = (): Promise<void> => {
     return new Promise<void>((resolve: () => void): void => {
