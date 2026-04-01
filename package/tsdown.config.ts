@@ -9,7 +9,7 @@ export default defineConfig(
         },
         target: "es2015",
         platform: "browser",
-        unbundle: false,
+        unbundle: true,
     },
     [
         esmPreset(),
