@@ -4,13 +4,9 @@ import { MessageChannelPolyfill } from "#/classes/channel";
 import { MessagePortPolyfill } from "#/classes/port";
 import { getDefaultMessageChannelPolyfillTarget } from "#/functions/target";
 
-const installMessageChannelPolyfill = (
+const installMessagePortPolyfill = (
     target: MessageChannelPolyfillTarget = getDefaultMessageChannelPolyfillTarget(),
 ): MessageChannelPolyfillTarget => {
-    if (typeof target.MessageChannel === "undefined") {
-        target.MessageChannel = MessageChannelPolyfill;
-    }
-
     if (typeof target.MessagePort === "undefined") {
         target.MessagePort = MessagePortPolyfill;
     }
@@ -18,4 +14,14 @@ const installMessageChannelPolyfill = (
     return target;
 };
 
-export { installMessageChannelPolyfill };
+const installMessageChannelPolyfill = (
+    target: MessageChannelPolyfillTarget = getDefaultMessageChannelPolyfillTarget(),
+): MessageChannelPolyfillTarget => {
+    if (typeof target.MessageChannel === "undefined") {
+        target.MessageChannel = MessageChannelPolyfill;
+    }
+
+    return target;
+};
+
+export { installMessageChannelPolyfill, installMessagePortPolyfill };

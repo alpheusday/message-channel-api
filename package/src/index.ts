@@ -19,4 +19,7 @@ export {
     MessagePortPolyfill,
     MessagePortPolyfill as MessagePort,
 } from "#/classes/port";
-export { installMessageChannelPolyfill } from "#/functions/install";
+export {
+    installMessageChannelPolyfill,
+    installMessagePortPolyfill,
+} from "#/functions/install";

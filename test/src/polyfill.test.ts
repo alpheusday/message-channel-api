@@ -2,6 +2,7 @@ import type { MessageChannelPolyfillTarget } from "message-channel-api";
 
 import {
     installMessageChannelPolyfill,
+    installMessagePortPolyfill,
     MessageChannelPolyfill,
     MessagePortPolyfill,
 } from "message-channel-api";
@@ -726,8 +727,10 @@ describe("installMessageChannelPolyfill", (): void => {
                 ExistingMessagePort as unknown as typeof MessagePortPolyfill,
         };
 
+        installMessagePortPolyfill(emptyTarget);
         installMessageChannelPolyfill(emptyTarget);
 
+        installMessagePortPolyfill(existingTarget);
         installMessageChannelPolyfill(existingTarget);
 
         expect(emptyTarget.MessageChannel).toBe(MessageChannelPolyfill);

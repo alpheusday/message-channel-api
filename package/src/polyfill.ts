@@ -1,3 +1,7 @@
-import { installMessageChannelPolyfill } from "#/functions/install";
+import {
+    installMessageChannelPolyfill,
+    installMessagePortPolyfill,
+} from "#/functions/install";
 
+installMessagePortPolyfill();
 installMessageChannelPolyfill();
