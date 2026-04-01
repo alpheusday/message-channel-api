@@ -5,13 +5,10 @@ class MessageChannelPolyfill {
     public readonly port2: MessagePortPolyfill;
 
     public constructor() {
-        const port1: MessagePortPolyfill = new MessagePortPolyfill();
-        const port2: MessagePortPolyfill = new MessagePortPolyfill();
+        this.port1 = new MessagePortPolyfill();
+        this.port2 = new MessagePortPolyfill();
 
-        connectMessagePorts(port1, port2);
-
-        this.port1 = port1;
-        this.port2 = port2;
+        connectMessagePorts(this.port1, this.port2);
     }
 }
 

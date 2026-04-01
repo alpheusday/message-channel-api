@@ -1,4 +1,8 @@
-import type { MessagePortEventHandler, MessagePortState } from "#/@types/port";
+import type {
+    MessagePortEventHandler,
+    MessagePortEventType,
+    MessagePortState,
+} from "#/@types/port";
 
 import { cloneMessageValue } from "#/classes/port/clone";
 import {
@@ -41,6 +45,18 @@ function handleClosePropertyListener(
     state.onclose?.call(this, event);
 }
 
+type MessagePortHandlerKey = "onclose" | "onmessage" | "onmessageerror";
+
+type MessagePortHandlerRegisteredKey =
+    | "closeHandlerRegistered"
+    | "messageErrorHandlerRegistered"
+    | "messageHandlerRegistered";
+
+type MessagePortPropertyListener = (
+    this: MessagePortPolyfill,
+    event: Event,
+) => void;
+
 class MessagePortPolyfill extends MessagePortEventTarget {
     public constructor() {
         super();
@@ -48,33 +64,50 @@ class MessagePortPolyfill extends MessagePortEventTarget {
         initializeMessagePortState(this);
     }
 
+    private setPropertyListener<THandlerKey extends MessagePortHandlerKey>(
+        type: MessagePortEventType,
+        handler: MessagePortState[THandlerKey],
+        handlerKey: THandlerKey,
+        registeredKey: MessagePortHandlerRegisteredKey,
+        listener: MessagePortPropertyListener,
+        shouldStart: boolean = false,
+    ): void {
+        const state: MessagePortState = getMessagePortState(this);
+
+        state[handlerKey] = handler;
+
+        if (handler === null) {
+            if (state[registeredKey]) {
+                super.removeEventListener(type, listener);
+                state[registeredKey] = false;
+            }
+
+            return void 0;
+        }
+
+        if (!state[registeredKey]) {
+            super.addEventListener(type, listener);
+            state[registeredKey] = true;
+        }
+
+        if (shouldStart) {
+            this.start();
+        }
+    }
+
     public get onmessage(): MessagePortEventHandler<"message"> {
         return getMessagePortState(this).onmessage;
     }
 
     public set onmessage(handler: MessagePortEventHandler<"message">) {
-        const state: MessagePortState = getMessagePortState(this);
-
-        state.onmessage = handler;
-
-        if (handler === null) {
-            if (state.messageHandlerRegistered) {
-                super.removeEventListener(
-                    "message",
-                    handleMessagePropertyListener,
-                );
-                state.messageHandlerRegistered = false;
-            }
-
-            return;
-        }
-
-        if (!state.messageHandlerRegistered) {
-            super.addEventListener("message", handleMessagePropertyListener);
-            state.messageHandlerRegistered = true;
-        }
-
-        this.start();
+        this.setPropertyListener(
+            "message",
+            handler,
+            "onmessage",
+            "messageHandlerRegistered",
+            handleMessagePropertyListener,
+            true,
+        );
     }
 
     public get onmessageerror(): MessagePortEventHandler<"messageerror"> {
@@ -82,29 +115,13 @@ class MessagePortPolyfill extends MessagePortEventTarget {
     }
 
     public set onmessageerror(handler: MessagePortEventHandler<"messageerror">) {
-        const state: MessagePortState = getMessagePortState(this);
-
-        state.onmessageerror = handler;
-
-        if (handler === null) {
-            if (state.messageErrorHandlerRegistered) {
-                super.removeEventListener(
-                    "messageerror",
-                    handleMessageErrorPropertyListener,
-                );
-                state.messageErrorHandlerRegistered = false;
-            }
-
-            return;
-        }
-
-        if (!state.messageErrorHandlerRegistered) {
-            super.addEventListener(
-                "messageerror",
-                handleMessageErrorPropertyListener,
-            );
-            state.messageErrorHandlerRegistered = true;
-        }
+        this.setPropertyListener(
+            "messageerror",
+            handler,
+            "onmessageerror",
+            "messageErrorHandlerRegistered",
+            handleMessageErrorPropertyListener,
+        );
     }
 
     public get onclose(): MessagePortEventHandler<"close"> {
@@ -112,23 +129,13 @@ class MessagePortPolyfill extends MessagePortEventTarget {
     }
 
     public set onclose(handler: MessagePortEventHandler<"close">) {
-        const state: MessagePortState = getMessagePortState(this);
-
-        state.onclose = handler;
-
-        if (handler === null) {
-            if (state.closeHandlerRegistered) {
-                super.removeEventListener("close", handleClosePropertyListener);
-                state.closeHandlerRegistered = false;
-            }
-
-            return;
-        }
-
-        if (!state.closeHandlerRegistered) {
-            super.addEventListener("close", handleClosePropertyListener);
-            state.closeHandlerRegistered = true;
-        }
+        this.setPropertyListener(
+            "close",
+            handler,
+            "onclose",
+            "closeHandlerRegistered",
+            handleClosePropertyListener,
+        );
     }
 
     public close(): void {

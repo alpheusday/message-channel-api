@@ -20,20 +20,15 @@ const selectMessageChannelPolyfillTarget = (
     candidates: MessageChannelPolyfillTargetCandidates,
     fallback: MessageChannelPolyfillTargetFallback = createMessageChannelPolyfillTargetFallback,
 ): MessageChannelPolyfillTarget => {
-    if (typeof candidates.self !== "undefined") {
-        return candidates.self;
-    }
-
-    if (typeof candidates.window !== "undefined") {
-        return candidates.window;
-    }
-
-    if (typeof candidates.globalThis !== "undefined") {
-        return candidates.globalThis;
-    }
-
-    if (typeof candidates.global !== "undefined") {
-        return candidates.global;
+    for (const candidate of [
+        candidates.self,
+        candidates.window,
+        candidates.globalThis,
+        candidates.global,
+    ]) {
+        if (typeof candidate !== "undefined") {
+            return candidate;
+        }
     }
 
     return fallback();
