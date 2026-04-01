@@ -3,6 +3,7 @@ import type { MessagePortEventHandler, MessagePortState } from "#/@types/port";
 import { cloneMessageValue } from "#/classes/port/clone";
 import {
     enqueueMessage,
+    enqueuePortCloseEvent,
     resetMessageQueue,
     scheduleMessageDispatch,
 } from "#/classes/port/dispatch";
@@ -29,6 +30,15 @@ function handleMessageErrorPropertyListener(
     const state: MessagePortState = getMessagePortState(this);
 
     state.onmessageerror?.call(this, event as MessageEvent<unknown>);
+}
+
+function handleClosePropertyListener(
+    this: MessagePortPolyfill,
+    event: Event,
+): void {
+    const state: MessagePortState = getMessagePortState(this);
+
+    state.onclose?.call(this, event);
 }
 
 class MessagePortPolyfill extends MessagePortEventTarget {
@@ -97,6 +107,30 @@ class MessagePortPolyfill extends MessagePortEventTarget {
         }
     }
 
+    public get onclose(): MessagePortEventHandler<"close"> {
+        return getMessagePortState(this).onclose;
+    }
+
+    public set onclose(handler: MessagePortEventHandler<"close">) {
+        const state: MessagePortState = getMessagePortState(this);
+
+        state.onclose = handler;
+
+        if (handler === null) {
+            if (state.closeHandlerRegistered) {
+                super.removeEventListener("close", handleClosePropertyListener);
+                state.closeHandlerRegistered = false;
+            }
+
+            return;
+        }
+
+        if (!state.closeHandlerRegistered) {
+            super.addEventListener("close", handleClosePropertyListener);
+            state.closeHandlerRegistered = true;
+        }
+    }
+
     public close(): void {
         const state: MessagePortState = getMessagePortState(this);
 
@@ -111,7 +145,12 @@ class MessagePortPolyfill extends MessagePortEventTarget {
         state.entangledPort = null;
 
         if (entangledPort !== null) {
-            getMessagePortState(entangledPort).entangledPort = null;
+            const entangledPortState: MessagePortState =
+                getMessagePortState(entangledPort);
+
+            entangledPortState.entangledPort = null;
+
+            enqueuePortCloseEvent(entangledPort);
         }
     }
 

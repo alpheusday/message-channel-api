@@ -89,7 +89,7 @@ class MessagePortEventTarget implements EventTarget {
         const listeners: MessagePortEventListenerEntry[] | undefined =
             this.listeners.get(event.type);
 
-        if (event instanceof MessagePortMessageEvent) {
+        if (event instanceof MessagePortEvent) {
             event.setCurrentTarget(this);
         }
 
@@ -109,7 +109,7 @@ class MessagePortEventTarget implements EventTarget {
                 invokeMessagePortEventListener(this, listener.callback, event);
 
                 if (
-                    event instanceof MessagePortMessageEvent &&
+                    event instanceof MessagePortEvent &&
                     event.immediatePropagationStopped
                 ) {
                     break;
@@ -117,7 +117,7 @@ class MessagePortEventTarget implements EventTarget {
             }
         }
 
-        if (event instanceof MessagePortMessageEvent) {
+        if (event instanceof MessagePortEvent) {
             event.clearCurrentTarget();
         }
 
@@ -166,7 +166,7 @@ class MessagePortEventTarget implements EventTarget {
     }
 }
 
-class MessagePortMessageEvent<TData = unknown> implements MessageEvent<TData> {
+class MessagePortEvent implements Event {
     private currentEventTarget: EventTarget | null = null;
     private defaultPreventedState: boolean = false;
     private immediatePropagationStoppedState: boolean = false;
@@ -182,16 +182,10 @@ class MessagePortMessageEvent<TData = unknown> implements MessageEvent<TData> {
     public readonly isTrusted: boolean = false;
     public readonly timeStamp: number = Date.now();
     public cancelBubble: boolean = false;
-    public data: TData;
-    public lastEventId: string = "";
-    public origin: string = "";
-    public ports: MessagePort[] = [];
     public returnValue: boolean = true;
-    public source: MessageEventSource | null = null;
     public type: string;
 
-    public constructor(type: MessagePortEventType, data: TData) {
-        this.data = data;
+    public constructor(type: string) {
         this.type = type;
     }
 
@@ -245,33 +239,6 @@ class MessagePortMessageEvent<TData = unknown> implements MessageEvent<TData> {
         this.type = type;
     }
 
-    public initMessageEvent(
-        type: string,
-        _bubbles?: boolean,
-        _cancelable?: boolean,
-        data?: TData,
-        origin?: string,
-        lastEventId?: string,
-        source?: MessageEventSource | null,
-        ports?: MessagePort[],
-    ): void {
-        if (this.targetEventTarget !== null) {
-            return void 0;
-        }
-
-        this.type = type;
-
-        if (typeof data !== "undefined") {
-            this.data = data;
-        }
-
-        this.origin = typeof origin === "undefined" ? "" : origin;
-        this.lastEventId =
-            typeof lastEventId === "undefined" ? "" : lastEventId;
-        this.source = typeof source === "undefined" ? null : source;
-        this.ports = typeof ports === "undefined" ? [] : ports;
-    }
-
     public preventDefault(): void {
         this.defaultPreventedState = true;
         this.returnValue = false;
@@ -295,6 +262,54 @@ class MessagePortMessageEvent<TData = unknown> implements MessageEvent<TData> {
     }
 }
 
+class MessagePortMessageEvent<TData = unknown>
+    extends MessagePortEvent
+    implements MessageEvent<TData>
+{
+    public data: TData;
+    public lastEventId: string = "";
+    public origin: string = "";
+    public ports: MessagePort[] = [];
+    public source: MessageEventSource | null = null;
+
+    public constructor(type: MessagePortEventType, data: TData) {
+        super(type);
+
+        this.data = data;
+    }
+
+    public initMessageEvent(
+        type: string,
+        _bubbles?: boolean,
+        _cancelable?: boolean,
+        data?: TData,
+        origin?: string,
+        lastEventId?: string,
+        source?: MessageEventSource | null,
+        ports?: MessagePort[],
+    ): void {
+        if (this.target !== null) {
+            return void 0;
+        }
+
+        this.type = type;
+
+        if (typeof data !== "undefined") {
+            this.data = data;
+        }
+
+        this.origin = typeof origin === "undefined" ? "" : origin;
+        this.lastEventId =
+            typeof lastEventId === "undefined" ? "" : lastEventId;
+        this.source = typeof source === "undefined" ? null : source;
+        this.ports = typeof ports === "undefined" ? [] : ports;
+    }
+}
+
+const createPortEvent = (type: string): Event => {
+    return new MessagePortEvent(type);
+};
+
 const createMessageEvent = (
     type: MessagePortEventType,
     data: unknown,
@@ -302,4 +317,4 @@ const createMessageEvent = (
     return new MessagePortMessageEvent(type, data);
 };
 
-export { createMessageEvent, MessagePortEventTarget };
+export { createMessageEvent, createPortEvent, MessagePortEventTarget };

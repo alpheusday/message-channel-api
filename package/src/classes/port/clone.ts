@@ -4,7 +4,7 @@ import type {
     TypedArrayConstructor,
 } from "#/@types/port";
 
-import { createMessageEvent } from "#/classes/port/event";
+import { createMessageEvent, createPortEvent } from "#/classes/port/event";
 
 const createDataCloneError = (message: string): Error => {
     if (typeof DOMException === "function") {
@@ -218,4 +218,4 @@ const cloneMessageValue = (
     });
 };
 
-export { cloneMessageValue, createMessageEvent };
+export { cloneMessageValue, createMessageEvent, createPortEvent };

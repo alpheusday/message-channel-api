@@ -97,17 +97,30 @@ describe("MessageChannelPolyfill", (): void => {
 
         const received: string[] = [];
 
-        channel.port2.addEventListener("message", (event: Event): void => {
-            received.push((event as MessageEvent<string>).data);
-        });
+        const allMessagesReceived: Promise<void> = new Promise<void>(
+            (resolve: () => void): void => {
+                channel.port2.addEventListener(
+                    "message",
+                    (event: Event): void => {
+                        received.push((event as MessageEvent<string>).data);
+
+                        if (received.length === 3) {
+                            resolve();
+                        }
+                    },
+                );
+            },
+        );
 
         channel.port1.postMessage("first");
+
         channel.port1.postMessage("second");
+
         channel.port1.postMessage("third");
 
         channel.port2.start();
 
-        await waitForTurn();
+        await allMessagesReceived;
 
         expect(received).toEqual([
             "first",
@@ -275,6 +288,64 @@ describe("MessageChannelPolyfill", (): void => {
         ]);
     });
 
+    test("delivers queued messages one task at a time", async (): Promise<void> => {
+        const channel: MessageChannelPolyfill = new MessageChannelPolyfill();
+
+        const received: string[] = [];
+
+        let resolveAfterFirstMessageTask: ((value: string[]) => void) | null =
+            null;
+
+        const afterFirstMessageTask: Promise<string[]> = new Promise<string[]>(
+            (resolve: (value: string[]) => void): void => {
+                resolveAfterFirstMessageTask = resolve;
+            },
+        );
+
+        let resolveAfterSecondMessageTask: (() => void) | null = null;
+
+        const afterSecondMessageTask: Promise<void> = new Promise<void>(
+            (resolve: () => void): void => {
+                resolveAfterSecondMessageTask = resolve;
+            },
+        );
+
+        channel.port2.onmessage = (event: MessageEvent<unknown>): void => {
+            const data: string = event.data as string;
+
+            received.push(data);
+
+            Promise.resolve().then((): void => {
+                received.push(`micro:${data}`);
+
+                if (data === "first") {
+                    resolveAfterFirstMessageTask?.(received.slice());
+                    return;
+                }
+
+                resolveAfterSecondMessageTask?.();
+            });
+        };
+
+        channel.port1.postMessage("first");
+
+        channel.port1.postMessage("second");
+
+        expect(await afterFirstMessageTask).toEqual([
+            "first",
+            "micro:first",
+        ]);
+
+        await afterSecondMessageTask;
+
+        expect(received).toEqual([
+            "first",
+            "micro:first",
+            "second",
+            "micro:second",
+        ]);
+    });
+
     test("setting onmessage starts the port and flushes queued messages", async (): Promise<void> => {
         const channel: MessageChannelPolyfill = new MessageChannelPolyfill();
 
@@ -431,6 +502,130 @@ describe("MessageChannelPolyfill", (): void => {
         await waitForTurn();
 
         expect(received).toEqual([]);
+    });
+
+    test("supports onclose and dispatches it after the last message task", async (): Promise<void> => {
+        const channel: MessageChannelPolyfill = new MessageChannelPolyfill();
+
+        const received: string[] = [];
+
+        let resolveAfterMessageTask: ((value: string[]) => void) | null = null;
+
+        const afterMessageTask: Promise<string[]> = new Promise<string[]>(
+            (resolve: (value: string[]) => void): void => {
+                resolveAfterMessageTask = resolve;
+            },
+        );
+
+        let resolveAfterClose: ((value: string[]) => void) | null = null;
+
+        const afterClose: Promise<string[]> = new Promise<string[]>(
+            (resolve: (value: string[]) => void): void => {
+                resolveAfterClose = resolve;
+            },
+        );
+
+        channel.port2.onmessage = (event: MessageEvent<unknown>): void => {
+            received.push(event.data as string);
+
+            Promise.resolve().then((): void => {
+                received.push("micro:message");
+                resolveAfterMessageTask?.(received.slice());
+            });
+        };
+
+        channel.port2.onclose = (): void => {
+            received.push("close");
+            resolveAfterClose?.(received.slice());
+        };
+
+        channel.port1.postMessage("value");
+
+        channel.port1.close();
+
+        expect(await afterMessageTask).toEqual([
+            "value",
+            "micro:message",
+        ]);
+
+        expect(await afterClose).toEqual([
+            "value",
+            "micro:message",
+            "close",
+        ]);
+    });
+
+    test("dispatches close after queued messages on a started port", async (): Promise<void> => {
+        const channel: MessageChannelPolyfill = new MessageChannelPolyfill();
+
+        const received: string[] = [];
+
+        const closeReceived: Promise<string[]> = new Promise<string[]>(
+            (resolve: (value: string[]) => void): void => {
+                channel.port2.addEventListener("close", (): void => {
+                    received.push("close");
+                    resolve(received.slice());
+                });
+            },
+        );
+
+        channel.port2.onmessage = (event: MessageEvent<unknown>): void => {
+            received.push(event.data as string);
+        };
+
+        channel.port1.postMessage("first");
+
+        channel.port1.postMessage("second");
+
+        channel.port1.close();
+
+        expect(await closeReceived).toEqual([
+            "first",
+            "second",
+            "close",
+        ]);
+    });
+
+    test("dispatches close without starting the port and preserves queued messages", async (): Promise<void> => {
+        const channel: MessageChannelPolyfill = new MessageChannelPolyfill();
+
+        const received: string[] = [];
+
+        const queuedMessageReceived: Promise<string[]> = new Promise<string[]>(
+            (resolve: (value: string[]) => void): void => {
+                channel.port2.addEventListener(
+                    "message",
+                    (event: Event): void => {
+                        received.push((event as MessageEvent<string>).data);
+                        resolve(received.slice());
+                    },
+                );
+            },
+        );
+
+        const closeReceived: Promise<string[]> = new Promise<string[]>(
+            (resolve: (value: string[]) => void): void => {
+                channel.port2.addEventListener("close", (): void => {
+                    received.push("close");
+                    resolve(received.slice());
+                });
+            },
+        );
+
+        channel.port1.postMessage("queued");
+
+        channel.port1.close();
+
+        expect(await closeReceived).toEqual([
+            "close",
+        ]);
+
+        channel.port2.start();
+
+        expect(await queuedMessageReceived).toEqual([
+            "close",
+            "queued",
+        ]);
     });
 
     test("supports transfer lists", async (): Promise<void> => {

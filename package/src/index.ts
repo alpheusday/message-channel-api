@@ -2,6 +2,7 @@ export type {
     FallbackCloneContext,
     MessagePortEventDataMap,
     MessagePortEventHandler,
+    MessagePortEventMap,
     MessagePortEventType,
     MessagePortState,
     TypedArray,

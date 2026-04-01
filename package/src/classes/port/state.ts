@@ -6,12 +6,15 @@ const messagePortStates: WeakMap<MessagePortPolyfill, MessagePortState> =
 
 const createMessagePortState = (): MessagePortState => ({
     closed: false,
+    closeHandlerRegistered: false,
+    closePending: false,
     dispatchScheduled: false,
     entangledPort: null,
     messageErrorHandlerRegistered: false,
     messageHandlerRegistered: false,
     messageQueue: [],
     messageQueueIndex: 0,
+    onclose: null,
     onmessage: null,
     onmessageerror: null,
     started: false,

@@ -1,17 +1,20 @@
 import type { MessagePortPolyfill } from "#/classes/port";
 
-type MessagePortEventType = "message" | "messageerror";
+type MessagePortEventType = "close" | "message" | "messageerror";
 
 type MessagePortEventDataMap = {
     message: unknown;
     messageerror: unknown;
 };
 
+type MessagePortEventMap = {
+    close: Event;
+    message: MessageEvent<MessagePortEventDataMap["message"]>;
+    messageerror: MessageEvent<MessagePortEventDataMap["messageerror"]>;
+};
+
 type MessagePortEventHandler<TType extends MessagePortEventType> =
-    | ((
-          this: MessagePortPolyfill,
-          event: MessageEvent<MessagePortEventDataMap[TType]>,
-      ) => void)
+    | ((this: MessagePortPolyfill, event: MessagePortEventMap[TType]) => void)
     | null;
 
 type TypedArray =
@@ -35,12 +38,15 @@ type TypedArrayConstructor = new (
 
 type MessagePortState = {
     closed: boolean;
+    closeHandlerRegistered: boolean;
+    closePending: boolean;
     dispatchScheduled: boolean;
     entangledPort: MessagePortPolyfill | null;
     messageErrorHandlerRegistered: boolean;
     messageHandlerRegistered: boolean;
     messageQueue: unknown[];
     messageQueueIndex: number;
+    onclose: MessagePortEventHandler<"close">;
     onmessage: MessagePortEventHandler<"message">;
     onmessageerror: MessagePortEventHandler<"messageerror">;
     started: boolean;
@@ -54,6 +60,7 @@ export type {
     FallbackCloneContext,
     MessagePortEventDataMap,
     MessagePortEventHandler,
+    MessagePortEventMap,
     MessagePortEventType,
     MessagePortState,
     TypedArray,
