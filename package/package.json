@@ -1,0 +1,47 @@
+{
+    "name": "message-channel-polyfill",
+    "version": "0.1.0",
+    "description": "A polyfill for the MessageChannel API",
+    "keywords": [
+        "messagechannel",
+        "message-channel",
+        "messageport",
+        "message-port",
+        "polyfill",
+        "ts",
+        "typescript",
+        "js",
+        "javascript"
+    ],
+    "homepage": "https://github.com/alpheuscfg/message-channel-polyfill",
+    "bugs": "https://github.com/alpheuscfg/message-channel-polyfill/issues",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alpheuscfg/message-channel-polyfill.git",
+        "directory": "package"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Alpheus",
+        "email": "contact@alphe.us"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js"
+        },
+        "./polyfill": {
+            "types": "./dist/polyfill.d.ts",
+            "import": "./dist/polyfill.mjs",
+            "require": "./dist/polyfill.js"
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist"
+    ]
+}

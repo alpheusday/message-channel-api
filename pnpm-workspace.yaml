@@ -1,0 +1,14 @@
+packages:
+    - ./package
+    - ./test
+
+minimumReleaseAge: 1440
+
+minimumReleaseAgeExclude:
+    - "@apst/biome"
+    - "@apst/tsconfig"
+    - "@apst/tsdown"
+    - "@rolldown/*"
+    - "rolldown"
+    - "@tsdown/*"
+    - "tsdown"

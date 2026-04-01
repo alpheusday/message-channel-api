@@ -1,0 +1,10 @@
+{
+    "private": true,
+    "dependencies": {
+        "message-channel-polyfill": "workspace:*",
+        "vitest": "^4.1.0"
+    },
+    "devDependencies": {
+        "vite-tsconfig-paths": "^6.1.1"
+    }
+}
