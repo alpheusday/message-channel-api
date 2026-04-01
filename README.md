@@ -25,10 +25,7 @@ bun add message-channel-api
 For using the API directly:
 
 ```ts
-import {
-    MessageChannel,
-    MessagePort,
-} from "message-channel-api";
+import { MessageChannel } from "message-channel-api";
 
 const channel: MessageChannel = new MessageChannel();
 
