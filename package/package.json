@@ -1,7 +1,7 @@
 {
-    "name": "message-channel-polyfill",
+    "name": "message-channel-api",
     "version": "0.1.0",
-    "description": "A polyfill for the MessageChannel API",
+    "description": "A MessageChannel API",
     "keywords": [
         "messagechannel",
         "message-channel",
@@ -13,11 +13,11 @@
         "js",
         "javascript"
     ],
-    "homepage": "https://github.com/alpheuscfg/message-channel-polyfill",
-    "bugs": "https://github.com/alpheuscfg/message-channel-polyfill/issues",
+    "homepage": "https://github.com/alpheuscfg/message-channel-api",
+    "bugs": "https://github.com/alpheuscfg/message-channel-api/issues",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alpheuscfg/message-channel-polyfill.git",
+        "url": "https://github.com/alpheuscfg/message-channel-api.git",
         "directory": "package"
     },
     "license": "MIT",

@@ -1,6 +1,6 @@
-# MessageChannel Polyfill
+# MessageChannel API
 
-A polyfill for the `MessageChannel` API.
+A MessageChannel API.
 
 ## Installation
 
@@ -8,24 +8,24 @@ Install this package as a dependency in the project:
 
 ```sh
 # npm
-npm i message-channel-polyfill
+npm i message-channel-api
 
 # Yarn
-yarn add message-channel-polyfill
+yarn add message-channel-api
 
 # pnpm
-pnpm add message-channel-polyfill
+pnpm add message-channel-api
 
 # Bun
-bun add message-channel-polyfill
+bun add message-channel-api
 ```
 
 ## Usage
 
-Import the polyfill:
+For importing the polyfill, add the following to the entry:
 
 ```ts
-import "message-channel-polyfill/polyfill";
+import "message-channel-api/polyfill";
 ```
 
 ## Compatibility
