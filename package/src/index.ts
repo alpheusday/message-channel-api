@@ -9,9 +9,13 @@ export type {
 } from "#/@types/port";
 export type { MessageChannelPolyfillTarget } from "#/@types/target";
 
-export { MessageChannelPolyfill } from "#/classes/channel";
+export {
+    MessageChannelPolyfill,
+    MessageChannelPolyfill as MessageChannel,
+} from "#/classes/channel";
 export {
     connectMessagePorts,
     MessagePortPolyfill,
+    MessagePortPolyfill as MessagePort,
 } from "#/classes/port";
 export { installMessageChannelPolyfill } from "#/functions/install";
