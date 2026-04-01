@@ -7,8 +7,9 @@ export default defineConfig(
             index: "./src/index.ts",
             polyfill: "./src/polyfill.ts",
         },
+        target: "es2015",
         platform: "browser",
-        unbundle: true,
+        unbundle: false,
     },
     [
         esmPreset(),
