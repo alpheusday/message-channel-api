@@ -2,7 +2,7 @@
     "private": true,
     "dependencies": {
         "message-channel-api": "workspace:*",
-        "vitest": "^4.1.0"
+        "vitest": "^4.1.3"
     },
     "devDependencies": {
         "vite-tsconfig-paths": "^6.1.1"
